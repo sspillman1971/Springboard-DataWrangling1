@@ -1,0 +1,121 @@
+---
+title: "Data Wrangling Project 1"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## GitHub Documents
+
+This is an R Markdown format used for publishing markdown documents to GitHub. When you click the **Knit** button all R code chunks are run and a markdown file (.md) suitable for publishing to GitHub is generated.
+
+## Including Code
+
+You can include R code in the document as follows:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+
+# library("checkpoint", lib.loc="~/R/win-library/3.3")
+# checkpoint("2017-01-01")
+library("tidyr", lib.loc="~/R/win-library/3.3")
+library("dplyr", lib.loc="~/R/win-library/3.3")
+library("readr", lib.loc="~/R/win-library/3.3")
+
+
+# Load data into RStudio
+
+refine_original <- read_csv("~/Springboard/Data Wrangling/refine_original.csv")
+
+## Create refine_clean document to make changes to.
+
+refine_clean <- refine_original
+
+# Clean up brand names
+
+refine_clean$company <- tolower(refine_clean$company)
+
+refine_clean$company[1] <- "philips"
+refine_clean$company[2] <- "philips"
+refine_clean$company[3] <- "philips"
+refine_clean$company[4] <- "philips"
+refine_clean$company[5] <- "philips"
+refine_clean$company[6] <- "philips"
+refine_clean$company[10] <- "akzo"
+refine_clean$company[11] <- "akzo"
+refine_clean$company[14] <- "philips"
+refine_clean$company[15] <- "philips"
+refine_clean$company[16] <- "philips"
+refine_clean$company[22] <- "unilever"
+
+# Separate product code and number
+
+refine_clean <- refine_clean %>%
+  separate('Product code / number', c("product_code", "product_number"), sep = "-")
+
+# Add product categories
+
+factor_product_code <- factor(refine_clean$product_code)
+
+factor_product_categories <- factor(refine_clean$product_code)
+levels(factor_product_code) <- c("Smartphone", "Tablet", "TV", "Laptop")
+
+refine_clean %>%
+  select (product_code) %>%
+  mutate(categories = factor_product_code)
+  
+refine_clean <- refine_clean %>% 
+  mutate(categories = factor_product_code)
+
+# Add full address for geocoding
+
+refine_clean %>%
+  select(address, city, country) %>%
+  mutate(full_address = paste(address, city, country, sep = ','))
+  
+refine_clean <- refine_clean %>% mutate(full_address = paste(address, city, country, sep = ','))
+
+# Add 4 binary columns for product (product_smartphone, product_tv, product_laptop and product_tablet) 
+# and 4 binary columns for company (company_philips, company_akzo, company_van_houten and 
+# company_unilever)
+
+refine_clean %>%
+  select(company) %>% 
+  mutate(company_akzo = ifelse(company == "akzo", 1,0), 
+         company_philips = ifelse(company == "philips", 1,0),    
+         company_unilever = ifelse(company == "unilever", 1,0), 
+         company_van_houten = ifelse(company == "van houten", 1,0)) 
+  
+refine_clean <- refine_clean %>% 
+  mutate(company_akzo = ifelse(company == "akzo", 1,0), 
+         company_philips = ifelse(company == "philips", 1,0),    
+         company_unilever = ifelse(company == "unilever", 1,0), 
+         company_van_houten = ifelse(company == "van houten", 1,0))
+
+refine_clean %>%
+  select(categories) %>%
+  mutate(product_smartphone = ifelse(categories == "Smartphone",1,0), 
+         product_tablet = ifelse(categories == "Tablet",1,0), 
+         product_tv = ifelse(categories == "TV",1,0), 
+         product_laptop = ifelse(categories == "Laptop",1,0))
+  
+refine_clean <- refine_clean %>% 
+  mutate(product_smartphone = ifelse(categories == "Smartphone",1,0), 
+         product_tablet = ifelse(categories == "Tablet",1,0), 
+         product_tv = ifelse(categories == "TV",1,0), 
+         product_laptop = ifelse(categories == "Laptop",1,0))
+
+refine_clean
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
